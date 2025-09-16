@@ -1,15 +1,8 @@
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const http = require('http');
+const httpProxy = require('http-proxy');
 
-const apiProxy = createProxyMiddleware({
-  target: 'https://example.org', // Replace with your target API
-  changeOrigin: true,
-  pathRewrite: {
-    '^/api': '', // Remove '/api' prefix when forwarding
-  },
-  onProxyRes(proxyRes) {
-    proxyRes.headers['x-added'] = 'foobar'; // Add custom header
-    delete proxyRes.headers['x-removed']; // Remove unwanted header
-  },
-});
+const proxy = httpProxy.createProxyServer({});
 
-module.exports = (req, res) => apiProxy(req, res);
+module.exports = (req, res) => {
+  proxy.web(req, res, { target: 'https://example.com' }); // replace with target URL
+};
