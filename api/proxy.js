@@ -1,12 +1,19 @@
 import httpProxy from "http-proxy";
+import url from "url";
 
 const proxy = httpProxy.createProxyServer();
 
 export default function handler(req, res) {
-  // The target site you want to proxy traffic to
-  const target = "https://example.com"; 
+  const query = url.parse(req.url, true).query;
+  const target = query.url;
 
-  proxy.web(req, res, { target }, (err) => {
+  if (!target) {
+    res.statusCode = 400;
+    res.end("Error: Missing ?url= parameter");
+    return;
+  }
+
+  proxy.web(req, res, { target, changeOrigin: true }, (err) => {
     console.error("Proxy error:", err);
     res.statusCode = 500;
     res.end("Proxy error.");
